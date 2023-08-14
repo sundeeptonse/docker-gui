@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  service-ff:
+    image: docker-gui-ff:1.0
+    build: ./docker/ff/
+    privileged: true
+    environment:
+      - DISPLAY=10.0.0.142:0
+    command: /usr/bin/firefox
+    profiles: ["build", "disabled"]
+
+    #volumes:
+    #  - /tmp/.X11-unix:/tmp/.X11-unix
+    #network_mode: host
+  service-intellij-centos:
+    image: docker-gui-intellij-centos:1.0
+    build: ./docker/intellij-centos/
+    privileged: true
+    environment:
+      - DISPLAY=10.0.0.142:0
+    command: /usr/sbin/sshd -D
+    #command: /usr/sbin/sshd -D && sh /opt/idea-IC-232.8660.185/bin/idea.sh
+    #command:  ["tail", "-f", "/dev/null"]
+    profiles: ["build","enabled"]
+    ports:
+      - 2022:22
+    volumes:
+      - centos-opt:/opt
+      - centos-home:/home/app
+    #volumes:
+    #  - /tmp/.X11-unix:/tmp/.X11-unix
+    #network_mode: host  
+  service-intellij-alpine:
+    image: docker-gui-intellij-alpine:1.0
+    build: ./docker/intellij-alpine/
+    privileged: true
+    environment:
+      - DISPLAY=10.0.0.142:0
+    #command: sh /opt/idea-IC-232.8660.185/bin/idea.sh
+    command:  ["tail", "-f", "/dev/null"]
+    profiles: ["build","disabled"]
+    #volumes:
+    #  - /tmp/.X11-unix:/tmp/.X11-unix
+    #network_mode: host    
+
+volumes:
+  centos-opt:
+    driver: local
+  centos-home:
+    driver: local
+
+##socat
+####socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"    
